@@ -43,8 +43,7 @@ public class TopicSimilarity {
     public void test() {
         similarities = calculateSimilarities(topicWordMatrix, topicsCount);
         similarities = sortSimilarities(similarities);
-        topicSequence = generateTopicSequence(similarities);
-        printMap(topicSequence);
+        printMap(similarities);
     }
 
     //calculate similarity
@@ -58,7 +57,7 @@ public class TopicSimilarity {
         }
 
         for (int i = 0; i < topicsCount; i++) {
-            for (int j = i+1; j < topicsCount; j++) {
+            for (int j = 0; j < topicsCount; j++) {
                 double cor = new PearsonsCorrelation().correlation(topicWordMatrix.getRow(i), topicWordMatrix.getRow(j));
                 //similarity=0.5*(DX+DY-根号((DX+DY)^2-4*DX*DY*(1-correlation(X, Y)^2))
                 double simil = 0.5 * (variances[i] + variances[j]- FastMath.sqrt(FastMath.pow(variances[i] + variances[j], 2) - 4 * variances[i] * variances[j] * FastMath.pow(1-cor, 2)));
@@ -92,21 +91,21 @@ public class TopicSimilarity {
         return sortedMap;
     }
 
-    public Map<Integer, Double> generateTopicSequence(Map<String, Double> map) {
-        Map<Integer, Double> topicSequence = new HashMap<Integer, Double>();
-        for (Map.Entry<String, Double> entry : map.entrySet()) {
-            String key = entry.getKey();
-            String[] index = key.split(",");
-            int row = Integer.parseInt(index[0]);
-            int col = Integer.parseInt(index[1]);
-            if(!topicSequence.containsKey(col)) {
-                topicSequence.put(col, entry.getValue());
-            }
-        }
-
-        return topicSequence;
-
-    }
+//    public Map<Integer, Double> generateTopicSequence(Map<String, Double> map) {
+//        Map<Integer, Double> topicSequence = new HashMap<Integer, Double>();
+//        for (Map.Entry<String, Double> entry : map.entrySet()) {
+//            String key = entry.getKey();
+//            String[] index = key.split(",");
+//            int row = Integer.parseInt(index[0]);
+//            int col = Integer.parseInt(index[1]);
+//            if(!topicSequence.containsKey(col)) {
+//                topicSequence.put(col, entry.getValue());
+//            }
+//        }
+//
+//        return topicSequence;
+//
+//    }
 
     public Map<Integer, Double> getTopicSequence() {
         return topicSequence;
@@ -133,8 +132,8 @@ public class TopicSimilarity {
     }
 
 
-    public static void printMap(Map<Integer, Double> map) {
-        for (Map.Entry<Integer, Double> entry : map.entrySet()) {
+    public static void printMap(Map<String, Double> map) {
+        for (Map.Entry<String, Double> entry : map.entrySet()) {
             System.out.println("[Key] : " + entry.getKey()
                     + " [Value] : " + entry.getValue());
         }
