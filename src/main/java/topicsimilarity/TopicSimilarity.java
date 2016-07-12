@@ -1,4 +1,4 @@
-
+package topicsimilarity;
 /**
  * Created by tianxia on 16/7/11.
  */
@@ -19,25 +19,12 @@ public class TopicSimilarity {
     private int topicsCount;
     private int wordsCount;
 
-    public TopicSimilarity(String wordCountFilePath) {
-        this.topicSequence = new HashMap<Integer, Double>();
-        this.similarities = new HashMap<String, Double>();
-        int rows = 3;
-        int columns = 3;
-        RealMatrix topicWordMatrix = MatrixUtils.createRealMatrix(rows, columns);
-        topicWordMatrix.addToEntry(0, 0, 0.1);
-        topicWordMatrix.addToEntry(0, 1, 0.2);
-        topicWordMatrix.addToEntry(0, 2, 0.7);
-        topicWordMatrix.addToEntry(1, 0, 0.2);
-        topicWordMatrix.addToEntry(1, 1, 0.3);
-        topicWordMatrix.addToEntry(1, 2, 0.5);
-        topicWordMatrix.addToEntry(2, 0, 0.2);
-        topicWordMatrix.addToEntry(2, 1, 0.3);
-        topicWordMatrix.addToEntry(2, 2, 0.5);
-        this.topicWordMatrix = topicWordMatrix;
-        topicsCount = rows;
-        wordsCount = columns;
-
+    public TopicSimilarity(MatrixReader matrixReader) {
+        topicSequence = new HashMap<Integer, Double>();
+        similarities = new HashMap<String, Double>();
+        topicWordMatrix = matrixReader.read();
+        topicsCount = topicWordMatrix.getRowDimension();
+        wordsCount = topicWordMatrix.getColumnDimension();
     }
 
     public void test() {

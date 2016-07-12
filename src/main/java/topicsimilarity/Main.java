@@ -1,18 +1,15 @@
+package topicsimilarity;
+
+import topicsimilarity.testing.TestMatrixReader;
+
 import java.util.Map;
 
-/**
- * Created by u on 16/7/12.
- */
+
 public class Main {
     public static void main(String args[]) {
-
-
-        TopicSimilarity testTS = new TopicSimilarity("");
+        MatrixReader testMatrixReader = new TestMatrixReader();
+        TopicSimilarity testTS = new TopicSimilarity(testMatrixReader);
         testTS.test();
-
-
-
-
     }
 
 
@@ -22,6 +19,4 @@ public class Main {
                     + " [Value] : " + entry.getValue());
         }
     }
-
-
 }
