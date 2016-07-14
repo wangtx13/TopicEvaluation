@@ -13,24 +13,22 @@ import java.util.*;
 
 public class TopicSimilarity {
 
-    private Map<Integer, Double> topicSequence;
+    private Map<Integer, Double> topicSequence;//
     private Map<String, Double> similarities;
     private RealMatrix topicWordMatrix;
     private int topicsCount;
-    private int wordsCount;
 
     public TopicSimilarity(MatrixReader matrixReader) {
         topicSequence = new HashMap<Integer, Double>();
         similarities = new HashMap<String, Double>();
         topicWordMatrix = matrixReader.read();
         topicsCount = topicWordMatrix.getRowDimension();
-        wordsCount = topicWordMatrix.getColumnDimension();
     }
 
-    public void test() {
+    public void generateTopicSimilarity() {
         similarities = calculateSimilarities(topicWordMatrix, topicsCount);
         similarities = sortSimilarities(similarities);
-        printMap(similarities);
+        topicSequence = generateTopicSequence(similarities);
     }
 
     //calculate similarity
@@ -47,7 +45,7 @@ public class TopicSimilarity {
             for (int j = 0; j < topicsCount; j++) {
                 double cor = new PearsonsCorrelation().correlation(topicWordMatrix.getRow(i), topicWordMatrix.getRow(j));
                 //similarity=0.5*(DX+DY-根号((DX+DY)^2-4*DX*DY*(1-correlation(X, Y)^2))
-                double simil = 0.5 * (variances[i] + variances[j]- FastMath.sqrt(FastMath.pow(variances[i] + variances[j], 2) - 4 * variances[i] * variances[j] * FastMath.pow(1-cor, 2)));
+                double simil = 0.5 * (variances[i] + variances[j]- FastMath.sqrt(FastMath.pow(variances[i] + variances[j], 2) - 4 * variances[i] * variances[j] * (1 - FastMath.pow(cor, 2))));
                 String key = i + "," + j;
                 similarities.put(key, simil);
             }
@@ -65,7 +63,7 @@ public class TopicSimilarity {
         Collections.sort(list, new Comparator<Map.Entry<String, Double>>() {
             public int compare(Map.Entry<String, Double> o1,
                                Map.Entry<String, Double> o2) {
-                return (o1.getValue()).compareTo(o2.getValue());
+                return (o2.getValue()).compareTo(o1.getValue());
             }
         });
 
@@ -78,21 +76,23 @@ public class TopicSimilarity {
         return sortedMap;
     }
 
-//    public Map<Integer, Double> generateTopicSequence(Map<String, Double> map) {
-//        Map<Integer, Double> topicSequence = new HashMap<Integer, Double>();
-//        for (Map.Entry<String, Double> entry : map.entrySet()) {
-//            String key = entry.getKey();
-//            String[] index = key.split(",");
-//            int row = Integer.parseInt(index[0]);
-//            int col = Integer.parseInt(index[1]);
-//            if(!topicSequence.containsKey(col)) {
-//                topicSequence.put(col, entry.getValue());
-//            }
-//        }
-//
-//        return topicSequence;
-//
-//    }
+    private Map<Integer, Double> generateTopicSequence(Map<String, Double> map) {
+        Map<Integer, Double> topicSequence = new HashMap<Integer, Double>();
+        for (Map.Entry<String, Double> entry : map.entrySet()) {
+            String key = entry.getKey();
+            String[] index = key.split(",");
+            int row = Integer.parseInt(index[0]);
+            int col = Integer.parseInt(index[1]);
+            if(!topicSequence.containsKey(row) && !topicSequence.containsKey(col)) {
+                double test = entry.getValue();
+                System.out.println(col + " " + test);
+                topicSequence.put(col, test);
+            }
+        }
+
+        return topicSequence;
+
+    }
 
     public Map<Integer, Double> getTopicSequence() {
         return topicSequence;
