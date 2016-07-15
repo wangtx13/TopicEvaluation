@@ -3,7 +3,6 @@ package topicsimilarity;
  * Created by tianxia on 16/7/11.
  */
 
-import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
@@ -13,22 +12,23 @@ import java.util.*;
 
 public class TopicSimilarity {
 
-    private Map<Integer, Double> topicSequence;//
     private Map<String, Double> similarities;
     private RealMatrix topicWordMatrix;
-    private int topicsCount;
+    private Map<Integer, Double> similaritiesAtReducedSeq;
+    private Map<Integer, Integer> topicReduceSequence;
 
     public TopicSimilarity(MatrixReader matrixReader) {
-        topicSequence = new HashMap<Integer, Double>();
         similarities = new HashMap<String, Double>();
         topicWordMatrix = matrixReader.read();
-        topicsCount = topicWordMatrix.getRowDimension();
+        similaritiesAtReducedSeq = new HashMap<Integer, Double>();
+        topicReduceSequence = new HashMap<Integer, Integer>();
     }
 
     public void generateTopicSimilarity() {
+        int topicsCount = topicWordMatrix.getRowDimension();
         similarities = calculateSimilarities(topicWordMatrix, topicsCount);
         similarities = sortSimilarities(similarities);
-        topicSequence = generateTopicSequence(similarities);
+        generateTopicSequence(similarities);
     }
 
     //calculate similarity
@@ -76,30 +76,34 @@ public class TopicSimilarity {
         return sortedMap;
     }
 
-    private Map<Integer, Double> generateTopicSequence(Map<String, Double> map) {
-        Map<Integer, Double> topicSequence = new HashMap<Integer, Double>();
+    private void generateTopicSequence(Map<String, Double> map) {
+        Map<Integer, Double> simAtReducedSeq = new HashMap<Integer, Double>();
+        Map<Integer, Integer> topicReduceSeq = new HashMap<Integer, Integer>();
+        int seq = 0;
         for (Map.Entry<String, Double> entry : map.entrySet()) {
             String key = entry.getKey();
             String[] index = key.split(",");
             int row = Integer.parseInt(index[0]);
             int col = Integer.parseInt(index[1]);
-            if(!topicSequence.containsKey(row) && !topicSequence.containsKey(col)) {
-                double test = entry.getValue();
-                System.out.println(col + " " + test);
-                topicSequence.put(col, test);
+
+            if(!simAtReducedSeq.containsKey(row) && !simAtReducedSeq.containsKey(col)) {
+                simAtReducedSeq.put(col, entry.getValue());
+                topicReduceSeq.put(col, seq);
+                seq++;
             }
         }
 
-        return topicSequence;
+        similaritiesAtReducedSeq = simAtReducedSeq;
+        topicReduceSequence = topicReduceSeq;
 
     }
 
-    public Map<Integer, Double> getTopicSequence() {
-        return topicSequence;
+    public Map<Integer, Double> getSimilaritiesAtReducedSeq() {
+        return similaritiesAtReducedSeq;
     }
 
-    public void setTopicSequence(Map<Integer, Double> topicSequence) {
-        this.topicSequence = topicSequence;
+    public void setSimilaritiesAtReducedSeq(Map<Integer, Double> similaritiesAtReducedSeq) {
+        this.similaritiesAtReducedSeq = similaritiesAtReducedSeq;
     }
 
     public RealMatrix getTopicWordMatrix() {
@@ -118,6 +122,13 @@ public class TopicSimilarity {
         this.similarities = similarities;
     }
 
+    public Map<Integer, Integer> getTopicReduceSequence() {
+        return topicReduceSequence;
+    }
+
+    public void setTopicReduceSequence(Map<Integer, Integer> topicReduceSequence) {
+        this.topicReduceSequence = topicReduceSequence;
+    }
 
     public static void printMap(Map<String, Double> map) {
         for (Map.Entry<String, Double> entry : map.entrySet()) {

@@ -1,11 +1,7 @@
 package topicsimilarity;
 
-import com.sun.org.apache.regexp.internal.RE;
 import org.apache.commons.math3.linear.RealMatrix;
-import topicsimilarity.testing.TestMatrixReader;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -20,12 +16,11 @@ public class Main {
         System.out.println("Please input the number of topics:");
         int topicCount = in.nextInt();
 
-        System.out.println(wordCountFilePath + " " + topicCount);
-
         MatrixReader matrixReader = new TopicWordMatrixReader(wordCountFilePath, topicCount);
         TopicSimilarity topicSimilarity = new TopicSimilarity(matrixReader);
         topicSimilarity.generateTopicSimilarity();
         RealMatrix topicWordMatrix = topicSimilarity.getTopicWordMatrix();
+
         //print topic word matrix
 //        for(int i = 0; i < topicWordMatrix.getRowDimension(); ++i) {
 //            for(int j = 0; j < topicWordMatrix.getColumnDimension(); ++j) {
@@ -36,9 +31,12 @@ public class Main {
 
         Map<String, Double> similarities = topicSimilarity.getSimilarities();
         printMap(similarities);
-        System.out.println("topicSequence");
-        Map<Integer, Double> topicSequence = topicSimilarity.getTopicSequence();
-        printMap2(topicSequence);
+        System.out.println("similaritiesAtReducedSeq");
+        Map<Integer, Double> similaritiesAtReducedSeq = topicSimilarity.getSimilaritiesAtReducedSeq();
+        printMap2(similaritiesAtReducedSeq);
+        System.out.println("topicReduceSequence");
+        Map<Integer, Integer> topicReduceSequence = topicSimilarity.getTopicReduceSequence();
+        printMap3(topicReduceSequence);
 
     }
 
@@ -52,6 +50,13 @@ public class Main {
 
     public static void printMap2(Map<Integer, Double> map) {
         for (Map.Entry<Integer, Double> entry : map.entrySet()) {
+            System.out.println("[Key] : " + entry.getKey()
+                    + " [Value] : " + entry.getValue());
+        }
+    }
+
+    public static void printMap3(Map<Integer, Integer> map) {
+        for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
             System.out.println("[Key] : " + entry.getKey()
                     + " [Value] : " + entry.getValue());
         }

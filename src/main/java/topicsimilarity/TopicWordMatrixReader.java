@@ -48,7 +48,13 @@ public class TopicWordMatrixReader implements MatrixReader {
                             int rowNumber = Integer.parseInt(label[0]);
                             int count = Integer.parseInt(label[1]);
                             //firstly, calculating the word count for each topic
-                            topicWordMatrixData[rowNumber][colNumber] = count;
+//                            if(rowNumber < topicCount && colNumber < totalWordCount)
+                                topicWordMatrixData[rowNumber][colNumber] = count;
+//                            else if(rowNumber >= topicCount) {
+//                                System.out.println("Please check the number of topics");
+//                            }
+//                            else if(colNumber >= totalWordCount)
+//                                System.out.println("Please check the word count file");
                             oneWordTotalCount = oneWordTotalCount + count;
                         }
                     }
@@ -67,6 +73,7 @@ public class TopicWordMatrixReader implements MatrixReader {
                 topicWordMatrix = MatrixUtils.createRealMatrix(topicWordMatrixData);
             }
         } catch (FileNotFoundException e) {
+            System.out.println("Please check the word count file path");
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
