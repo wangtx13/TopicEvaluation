@@ -38,14 +38,15 @@ public class Main {
         SortTopics sortTopics = new SortTopics(topicReducedSequence);
         String[] sortedTopics = sortTopics.generateSortedTopics(topicsFilePath);
 
-        String output = "";
-        output += testSortTopics(sortedTopics);
-        output += testTopicSimilarity(topicSimilarity);
-        writeToFile(outputFile, output);
+        String output = "Topic similarity sequence\n";
+        output += generateTopicSimilarity(topicSimilarity);
+        output += "Re-ranking in terms of topic similarity\n";
+        output += generateSortTopics(sortedTopics);
 
+        writeToFile(outputFile, output);
     }
 
-    public static String testSortTopics(String[] sortedTopics) {
+    public static String generateSortTopics(String[] sortedTopics) {
         String output = "";
         for(String str : sortedTopics) {
             output = output + str + "\n";
@@ -53,9 +54,9 @@ public class Main {
         return output;
     }
 
-    public static String testTopicSimilarity(TopicSimilarity topicSimilarity) {
+    public static String generateTopicSimilarity(TopicSimilarity topicSimilarity) {
         String output = "";
-        
+
         RealMatrix topicWordMatrix = topicSimilarity.getTopicWordMatrix();
 
         //print topic word matrix
@@ -66,7 +67,7 @@ public class Main {
 //            System.out.println();
 //        }
 
-        output = "sorted similarities\n";
+        output = "Sorted similarity sequence:\n";
         Map<String, Double> similarities = topicSimilarity.getSimilarities();
         for (Map.Entry<String, Double> entry : similarities.entrySet()) {
             output = output + "[row, col] : " + entry.getKey()
@@ -74,7 +75,7 @@ public class Main {
         }
 //        printSortedSimilarities(similarities);
 
-        output = output + "similaritiesAtReducedSeq\n";
+        output = output + "Topics' similarities:\n";
         Map<Integer, Double> similaritiesAtReducedSeq = topicSimilarity.getSimilaritiesAtReducedSeq();
         for (Map.Entry<Integer, Double> entry : similaritiesAtReducedSeq.entrySet()) {
             output = output + "[Topic] : " + entry.getKey()
@@ -82,7 +83,7 @@ public class Main {
         }
 //        printSimilaritiesAtReducedSeq(similaritiesAtReducedSeq);
 
-        output = output + "topicReduceSequence\n";
+        output = output + "Topic Reduced Sequence\n";
         Map<Integer, Integer> topicReduceSequence = topicSimilarity.getTopicReduceSequence();
         for (Map.Entry<Integer, Integer> entry : topicReduceSequence.entrySet()) {
            output = output + "[Topic] : " + entry.getKey()
