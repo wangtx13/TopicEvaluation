@@ -2,9 +2,15 @@ package topicsimilarity;
 
 import org.apache.commons.math3.linear.RealMatrix;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class Main {
@@ -20,6 +26,8 @@ public class Main {
         System.out.println("Please input the number of topics:");
         int topicCount = in.nextInt();
 
+        File outputFile = new File("./reRankingTopics.txt");
+
         MatrixReader matrixReader = new TopicWordMatrixReader(wordCountFilePath, topicCount);
         TopicSimilarity topicSimilarity = new TopicSimilarity(matrixReader);
         topicSimilarity.generateTopicSimilarity();
@@ -30,36 +38,58 @@ public class Main {
         SortTopics sortTopics = new SortTopics(topicReducedSequence);
         String[] sortedTopics = sortTopics.generateSortedTopics(topicsFilePath);
 
-        testSortTopics(sortedTopics);
+        String output = "";
+        output += testSortTopics(sortedTopics);
+        output += testTopicSimilarity(topicSimilarity);
+        writeToFile(outputFile, output);
 
     }
 
-    public static void testSortTopics(String[] sortedTopics) {
+    public static String testSortTopics(String[] sortedTopics) {
+        String output = "";
         for(String str : sortedTopics) {
-            System.out.println(str);
+            output = output + str + "\n";
         }
+        return output;
     }
 
-    public static void testTopicSimilarity(TopicSimilarity topicSimilarity) {
+    public static String testTopicSimilarity(TopicSimilarity topicSimilarity) {
+        String output = "";
+        
         RealMatrix topicWordMatrix = topicSimilarity.getTopicWordMatrix();
 
         //print topic word matrix
-        for(int i = 0; i < topicWordMatrix.getRowDimension(); ++i) {
-            for(int j = 0; j < topicWordMatrix.getColumnDimension(); ++j) {
-                System.out.print(topicWordMatrix.getEntry(i, j) + " ");
-            }
-            System.out.println();
-        }
+//        for(int i = 0; i < topicWordMatrix.getRowDimension(); ++i) {
+//            for(int j = 0; j < topicWordMatrix.getColumnDimension(); ++j) {
+//                System.out.print(topicWordMatrix.getEntry(i, j) + " ");
+//            }
+//            System.out.println();
+//        }
 
-        System.out.println("sorted similarities");
+        output = "sorted similarities\n";
         Map<String, Double> similarities = topicSimilarity.getSimilarities();
-        printSortedSimilarities(similarities);
-        System.out.println("similaritiesAtReducedSeq");
+        for (Map.Entry<String, Double> entry : similarities.entrySet()) {
+            output = output + "[row, col] : " + entry.getKey()
+                    + " [Topic Similarity] : " + entry.getValue() + "\n";
+        }
+//        printSortedSimilarities(similarities);
+
+        output = output + "similaritiesAtReducedSeq\n";
         Map<Integer, Double> similaritiesAtReducedSeq = topicSimilarity.getSimilaritiesAtReducedSeq();
-        printSimilaritiesAtReducedSeq(similaritiesAtReducedSeq);
-        System.out.println("topicReduceSequence");
+        for (Map.Entry<Integer, Double> entry : similaritiesAtReducedSeq.entrySet()) {
+            output = output + "[Topic] : " + entry.getKey()
+                    + " [Topic Similarity] : " + entry.getValue() + "\n";
+        }
+//        printSimilaritiesAtReducedSeq(similaritiesAtReducedSeq);
+
+        output = output + "topicReduceSequence\n";
         Map<Integer, Integer> topicReduceSequence = topicSimilarity.getTopicReduceSequence();
-        printTopicReduceSequence(topicReduceSequence);
+        for (Map.Entry<Integer, Integer> entry : topicReduceSequence.entrySet()) {
+           output = output + "[Topic] : " + entry.getKey()
+                    + " [Index] : " + entry.getValue() + "\n";
+        }
+//        printTopicReduceSequence(topicReduceSequence);
+        return output;
     }
 
     public static void printSortedSimilarities(Map<String, Double> map) {
@@ -81,5 +111,17 @@ public class Main {
             System.out.println("[Topic] : " + entry.getKey()
                     + " [Index] : " + entry.getValue());
         }
+    }
+
+    public static void writeToFile(File outputFile, String words) {
+        try {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile.getPath()))) {
+                writer.write(words);
+            }
+
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 }

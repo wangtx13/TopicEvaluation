@@ -4,8 +4,9 @@ import java.io.*;
 import java.util.Map;
 
 /**
- * Created by wangtianxia1 on 16/7/15.
+ * Created by wangtianxia on 16/7/15.
  */
+//The last removed topics should be ranked highest
 public class SortTopics {
     private Map<Integer, Integer> topicReduceSequence;
 
@@ -25,7 +26,7 @@ public class SortTopics {
                 while ((line = reader.readLine()) != null) {
                     String[] labels = line.split("\t| ");
                     int topicNumber = Integer.parseInt(labels[0]);
-                    int newIndex = topicReduceSequence.get(topicNumber);
+                    int newIndex = topicCount - topicReduceSequence.get(topicNumber) - 1;
                     sortedTopics[newIndex] = line;
                 }
             }
