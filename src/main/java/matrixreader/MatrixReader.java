@@ -1,4 +1,4 @@
-package topicsimilarity;
+package matrixreader;
 
 import org.apache.commons.math3.linear.RealMatrix;
 

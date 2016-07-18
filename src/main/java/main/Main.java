@@ -1,6 +1,11 @@
-package topicsimilarity;
+package main;
 
+import matrixreader.DocTopicMatrixReader;
+import matrixreader.MatrixReader;
+import matrixreader.TopicWordMatrixReader;
 import org.apache.commons.math3.linear.RealMatrix;
+import topicsimilarity.SortTopics;
+import topicsimilarity.TopicSimilarity;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,11 +22,11 @@ public class Main {
     public static void main(String args[]) {
 //        MatrixReader matrixReader = new TestMatrixReader();
         Scanner str = new Scanner(System.in);
-        System.out.println("Please input the word count file path:");
-        String wordCountFilePath = str.next();
-        Scanner str2 = new Scanner(System.in);
-        System.out.println("Please input the topics file path:");
-        String topicsFilePath = str2.next();
+        System.out.println("Please input the root path of files:");
+        String rootPath = str.next();
+        String wordCountFilePath = rootPath + "/word_top.txt";
+        String topicsFilePath = rootPath + "/keys.txt";
+        String compositionFilePath = rootPath + "/composition.txt";
         Scanner in = new Scanner(System.in);
         System.out.println("Please input the number of topics:");
         int topicCount = in.nextInt();
@@ -31,27 +36,29 @@ public class Main {
         MatrixReader matrixReader = new TopicWordMatrixReader(wordCountFilePath, topicCount);
         TopicSimilarity topicSimilarity = new TopicSimilarity(matrixReader);
         topicSimilarity.generateTopicSimilarity();
-
-        Map<Integer, Integer> topicReducedSequence = new HashMap<>();
-        topicReducedSequence = topicSimilarity.getTopicReduceSequence();
+        Map<Integer, Integer> topicReducedSequence = topicSimilarity.getTopicReduceSequence();
 
         SortTopics sortTopics = new SortTopics(topicReducedSequence);
         String[] sortedTopics = sortTopics.generateSortedTopics(topicsFilePath);
 
-        String output = "Topic similarity sequence\n";
+        DocTopicMatrixReader docTopicMatrixReader = new DocTopicMatrixReader(compositionFilePath, topicCount);
+        RealMatrix doctopicMatrix = docTopicMatrixReader.read();
+//        for(int i = 0; i < doctopicMatrix.getRowDimension(); i++) {
+//            for(int j = 0; j < doctopicMatrix.getColumnDimension(); j++) {
+//                System.out.print(doctopicMatrix.getEntry(i, j) + " ");
+//            }
+//            System.out.println();
+//        }
+
+        String output = "";
+        output += "Topic similarity sequence\n";
         output += generateTopicSimilarity(topicSimilarity);
         output += "Re-ranking in terms of topic similarity\n";
         output += generateSortTopics(sortedTopics);
+//        output += "Re-ranking in terms of topic coverage and variation:\n";
+//        output += generateCoverageAndVariation();
 
         writeToFile(outputFile, output);
-    }
-
-    public static String generateSortTopics(String[] sortedTopics) {
-        String output = "";
-        for(String str : sortedTopics) {
-            output = output + str + "\n";
-        }
-        return output;
     }
 
     public static String generateTopicSimilarity(TopicSimilarity topicSimilarity) {
@@ -90,6 +97,19 @@ public class Main {
                     + " [Index] : " + entry.getValue() + "\n";
         }
 //        printTopicReduceSequence(topicReduceSequence);
+        return output;
+    }
+
+    public static String generateSortTopics(String[] sortedTopics) {
+        String output = "";
+        for(String str : sortedTopics) {
+            output = output + str + "\n";
+        }
+        return output;
+    }
+
+    public static String generateCoverageAndVariation() {
+        String output = "";
         return output;
     }
 

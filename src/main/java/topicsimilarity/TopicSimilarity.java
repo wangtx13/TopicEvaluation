@@ -3,6 +3,7 @@ package topicsimilarity;
  * Created by tianxia on 16/7/11.
  */
 
+import matrixreader.MatrixReader;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;

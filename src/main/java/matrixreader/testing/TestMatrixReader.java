@@ -1,8 +1,8 @@
-package topicsimilarity.testing;
+package matrixreader.testing;
 
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
-import topicsimilarity.MatrixReader;
+import matrixreader.MatrixReader;
 
 public class TestMatrixReader implements MatrixReader {
     private static int ROWS = 3;
