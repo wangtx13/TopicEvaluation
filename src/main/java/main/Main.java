@@ -25,6 +25,7 @@ public class Main {
         System.out.println("Please input the root path of files:");
         String rootPath = str.next();
         String wordCountFilePath = rootPath + "/word_top.txt";
+//        String topicWordWeightFilePath = rootPath + "/topicwordweight.txt";
         String topicsFilePath = rootPath + "/keys.txt";
         String compositionFilePath = rootPath + "/composition.txt";
         Scanner in = new Scanner(System.in);
@@ -34,6 +35,7 @@ public class Main {
         File outputFile = new File("./reRankingTopics.txt");
 
         MatrixReader matrixReader = new TopicWordMatrixReader(wordCountFilePath, topicCount);
+//        MatrixReader matrixReader = new TopicWordMatrixReader(topicWordWeightFilePath, topicCount);
         TopicSimilarity topicSimilarity = new TopicSimilarity(matrixReader);
         topicSimilarity.generateTopicSimilarity();
         Map<Integer, Integer> topicReducedSequence = topicSimilarity.getTopicReduceSequence();
@@ -55,8 +57,6 @@ public class Main {
         output += generateTopicSimilarity(topicSimilarity);
         output += "Re-ranking in terms of topic similarity\n";
         output += generateSortTopics(sortedTopics);
-//        output += "Re-ranking in terms of topic coverage and variation:\n";
-//        output += generateCoverageAndVariation();
 
         writeToFile(outputFile, output);
     }
@@ -74,7 +74,7 @@ public class Main {
 //            System.out.println();
 //        }
 
-        output = "Sorted similarity sequence:\n";
+        output = "Sorted topics similarity sequence:\n";
         Map<String, Double> similarities = topicSimilarity.getSimilarities();
         for (Map.Entry<String, Double> entry : similarities.entrySet()) {
             output = output + "[row, col] : " + entry.getKey()
@@ -105,11 +105,6 @@ public class Main {
         for(String str : sortedTopics) {
             output = output + str + "\n";
         }
-        return output;
-    }
-
-    public static String generateCoverageAndVariation() {
-        String output = "";
         return output;
     }
 

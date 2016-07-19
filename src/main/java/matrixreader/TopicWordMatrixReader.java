@@ -50,7 +50,7 @@ public class TopicWordMatrixReader implements MatrixReader {
                             int count = Integer.parseInt(label[1]);
                             //firstly, calculating the word count for each topic
 //                            if(rowNumber < topicCount && colNumber < totalWordCount)
-                                topicWordMatrixData[rowNumber][colNumber] = count;
+                            topicWordMatrixData[rowNumber][colNumber] = count;
 //                            else if(rowNumber >= topicCount) {
 //                                System.out.println("Please check the number of topics");
 //                            }
