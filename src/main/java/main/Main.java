@@ -33,9 +33,17 @@ public class Main {
         int topicCount = in.nextInt();
 
         File outputFile = new File("./reRankingTopics.txt");
+        String output = "";
 
         MatrixReader matrixReader = new TopicWordMatrixReader(wordCountFilePath, topicCount);
 //        MatrixReader matrixReader = new TopicWordMatrixReader(topicWordWeightFilePath, topicCount);
+        RealMatrix topicWordMatrix = matrixReader.read();
+        for(int i = 0; i < topicWordMatrix.getRowDimension(); i++) {
+            for(int j = 0; j < topicWordMatrix.getColumnDimension(); j++) {
+                output = output + topicWordMatrix.getEntry(i, j) + "\t";
+            }
+            output += "\n";
+        }
         TopicSimilarity topicSimilarity = new TopicSimilarity(matrixReader);
         topicSimilarity.generateTopicSimilarity();
         Map<Integer, Integer> topicReducedSequence = topicSimilarity.getTopicReduceSequence();
@@ -52,11 +60,11 @@ public class Main {
 //            System.out.println();
 //        }
 
-        String output = "";
-        output += "Topic similarity sequence\n";
-        output += generateTopicSimilarity(topicSimilarity);
-        output += "Re-ranking in terms of topic similarity\n";
-        output += generateSortTopics(sortedTopics);
+
+//        output += "Topic similarity sequence\n";
+//        output += generateTopicSimilarity(topicSimilarity);
+//        output += "Re-ranking in terms of topic similarity\n";
+//        output += generateSortTopics(sortedTopics);
 
         writeToFile(outputFile, output);
     }
