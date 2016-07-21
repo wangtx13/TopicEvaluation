@@ -1,4 +1,4 @@
-package topicsimilarity;
+package topics.similarity;
 /**
  * Created by tianxia on 16/7/11.
  */
@@ -10,6 +10,8 @@ import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math3.util.FastMath;
 
 import java.util.*;
+
+import static tools.Tools.sortMap;
 
 public class TopicSimilarity {
 
@@ -28,7 +30,7 @@ public class TopicSimilarity {
     public void generateTopicSimilarity() {
         int topicsCount = topicWordMatrix.getRowDimension();
         similarities = calculateSimilarities(topicWordMatrix, topicsCount);
-        similarities = sortSimilarities(similarities);
+        similarities = sortMap(similarities);
         generateTopicSequence(similarities);
     }
 
@@ -52,29 +54,6 @@ public class TopicSimilarity {
             }
         }
         return similarities;
-    }
-
-    private Map<String, Double> sortSimilarities(Map<String, Double> unsortMap) {
-
-        // Convert Map to List
-        List<Map.Entry<String, Double>> list =
-                new LinkedList<Map.Entry<String, Double>>(unsortMap.entrySet());
-
-        // Sort list with comparator, to compare the Map values
-        Collections.sort(list, new Comparator<Map.Entry<String, Double>>() {
-            public int compare(Map.Entry<String, Double> o1,
-                               Map.Entry<String, Double> o2) {
-                return (o2.getValue()).compareTo(o1.getValue());
-            }
-        });
-
-        // Convert sorted map back to a Map
-        Map<String, Double> sortedMap = new LinkedHashMap<String, Double>();
-        for (Iterator<Map.Entry<String, Double>> it = list.iterator(); it.hasNext();) {
-            Map.Entry<String, Double> entry = it.next();
-            sortedMap.put(entry.getKey(), entry.getValue());
-        }
-        return sortedMap;
     }
 
     private void generateTopicSequence(Map<String, Double> map) {

@@ -1,4 +1,8 @@
-package topicsimilarity;
+package topics.similarity;
+
+import keywords.reranking.ReRankingByKR2;
+import matrixreader.MatrixReader;
+import org.apache.commons.math3.linear.RealMatrix;
 
 import java.io.*;
 import java.util.Map;
@@ -8,10 +12,14 @@ import java.util.Map;
  */
 //The last removed topics should be ranked highest
 public class SortTopics {
+    private RealMatrix topicWordMatrix;
     private Map<Integer, Integer> topicReduceSequence;
+    private Map<String, Integer> columnHeaderList;
 
-    public SortTopics(Map<Integer, Integer> topicReduceSequence) {
+    public SortTopics(MatrixReader topicWordMatrixReader, Map<Integer, Integer> topicReduceSequence) {
+        topicWordMatrix = topicWordMatrixReader.read();
         this.topicReduceSequence = topicReduceSequence;
+        columnHeaderList = topicWordMatrixReader.getColumnHeaderList();
     }
 
     public String[] generateSortedTopics(String topicsFilePath) {
@@ -25,8 +33,11 @@ public class SortTopics {
                     BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
                 while ((line = reader.readLine()) != null) {
                     String[] labels = line.split("\t| ");
-                    int topicNumber = Integer.parseInt(labels[0]);
-                    int newIndex = topicCount - topicReduceSequence.get(topicNumber) - 1;
+                    int topicIndex = Integer.parseInt(labels[0]);//label[0] is topic index
+                    //re-ranking the keywords in terms of KR2; the number of rows of topic word Matrix is the topic count
+                    ReRankingByKR2 reRankingByKR2 = new ReRankingByKR2(topicWordMatrix, topicWordMatrix.getRowDimension(), columnHeaderList);
+                    line = reRankingByKR2.reRankingKeywords(line, topicIndex);
+                    int newIndex = topicCount - topicReduceSequence.get(topicIndex) - 1;
                     sortedTopics[newIndex] = line;
                 }
             }

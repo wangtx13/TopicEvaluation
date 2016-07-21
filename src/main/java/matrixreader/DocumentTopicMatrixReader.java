@@ -6,6 +6,7 @@ import org.apache.commons.math3.linear.RealMatrix;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by wangtianxia1 on 16/7/18.
@@ -60,5 +61,10 @@ public class DocumentTopicMatrixReader implements MatrixReader{
     @Override
     public RealMatrix read() {
         return docTopicMatrixReader;
+    }
+
+    @Override
+    public Map<String, Integer> getColumnHeaderList() {
+        return null;
     }
 }

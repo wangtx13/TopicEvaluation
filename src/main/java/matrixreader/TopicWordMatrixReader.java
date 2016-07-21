@@ -1,12 +1,13 @@
 package matrixreader;
 
-import matrixreader.MatrixReader;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by wangtianxia1 on 16/7/14.
@@ -14,8 +15,10 @@ import java.util.Iterator;
 public class TopicWordMatrixReader implements MatrixReader {
 
     private RealMatrix topicWordMatrix;
+    private Map<String, Integer> columnHeaderList;
 
     public TopicWordMatrixReader(String wordCountFilePath, int topicCount) {
+        columnHeaderList = new HashMap<>();
         topicWordMatrix = getTopicWordMatrix(wordCountFilePath, topicCount);
     }
 
@@ -41,13 +44,13 @@ public class TopicWordMatrixReader implements MatrixReader {
                 }
 
                 double[][] topicWordMatrixData = new double[topicCount][totalTermCount];
-                int colNumber = 0;
-//                int[] totalWordCount = new int[topicCount];//The number of words, onw term may appears several times
-
+                int termIndex = 0;
                 Iterator it = wordList.iterator();
                 while(it.hasNext()){
                     String wordListStr = it.next().toString();
+                    //topics[0] is the term index, topics[1] is term, topics[2]-[n] is the word count
                     String[] topics = wordListStr.split("\t| ");
+                    columnHeaderList.put(topics[1], termIndex);
                     for(int i = 0; i < topics.length; ++i) {
                         if(topics[i].contains(":")) {
                             String[] label = topics[i].split(":");
@@ -55,17 +58,17 @@ public class TopicWordMatrixReader implements MatrixReader {
                             int rowNumber = Integer.parseInt(label[0]);
                             int count = Integer.parseInt(label[1]);
                             //firstly, calculating the word count for each topic
-                            topicWordMatrixData[rowNumber][colNumber] = count;
+                            topicWordMatrixData[rowNumber][termIndex] = count;
                             totalWordCount[rowNumber] += count;
                         }
                     }
                     //next word
-                    colNumber++;
+                    termIndex++;
                 }
 
                 //secondly, calculating the word count percentage
                 for (int i = 0; i < topicCount; ++i) {
-                    for(int j = 0; j < colNumber ;j++) {
+                    for(int j = 0; j < termIndex ;j++) {
                         if (totalTermCount != 0) {
                             topicWordMatrixData[i][j] = topicWordMatrixData[i][j]/totalWordCount[i];
                         }
@@ -82,7 +85,11 @@ public class TopicWordMatrixReader implements MatrixReader {
         }
 
         return topicWordMatrix;
+    }
 
+    @Override
+    public Map<String, Integer> getColumnHeaderList() {
+        return columnHeaderList;
     }
 
     @Override

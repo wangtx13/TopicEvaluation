@@ -4,6 +4,8 @@ import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import matrixreader.MatrixReader;
 
+import java.util.Map;
+
 public class TestMatrixReader implements MatrixReader {
     private static int ROWS = 3;
     private static int COLUMNS = 3;
@@ -31,5 +33,10 @@ public class TestMatrixReader implements MatrixReader {
     @Override
     public RealMatrix read() {
         return topicWordMatrix;
+    }
+
+    @Override
+    public Map<String, Integer> getColumnHeaderList() {
+        return null;
     }
 }
