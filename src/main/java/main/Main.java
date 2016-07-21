@@ -1,6 +1,6 @@
 package main;
 
-import matrixreader.DocTopicMatrixReader;
+import matrixreader.DocumentTopicMatrixReader;
 import matrixreader.MatrixReader;
 import matrixreader.TopicWordMatrixReader;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -11,7 +11,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -25,48 +24,60 @@ public class Main {
         System.out.println("Please input the root path of files:");
         String rootPath = str.next();
         String wordCountFilePath = rootPath + "/word_top.txt";
-//        String topicWordWeightFilePath = rootPath + "/topicwordweight.txt";
         String topicsFilePath = rootPath + "/keys.txt";
         String compositionFilePath = rootPath + "/composition.txt";
         Scanner in = new Scanner(System.in);
         System.out.println("Please input the number of topics:");
         int topicCount = in.nextInt();
+        Scanner strOut = new Scanner(System.in);
+        System.out.println("Please input the output file name:");
+        String outputFileName = "./" + strOut.next() + ".txt";
 
-        File outputFile = new File("./reRankingTopics.txt");
+        File outputFile = new File(outputFileName);
         String output = "";
 
-        MatrixReader matrixReader = new TopicWordMatrixReader(wordCountFilePath, topicCount);
-//        MatrixReader matrixReader = new TopicWordMatrixReader(topicWordWeightFilePath, topicCount);
-        RealMatrix topicWordMatrix = matrixReader.read();
-        for(int i = 0; i < topicWordMatrix.getRowDimension(); i++) {
-            for(int j = 0; j < topicWordMatrix.getColumnDimension(); j++) {
-                output = output + topicWordMatrix.getEntry(i, j) + "\t";
-            }
-            output += "\n";
-        }
-        TopicSimilarity topicSimilarity = new TopicSimilarity(matrixReader);
+        MatrixReader topicWordMatrixReader = new TopicWordMatrixReader(wordCountFilePath, topicCount);
+
+        TopicSimilarity topicSimilarity = new TopicSimilarity(topicWordMatrixReader);
         topicSimilarity.generateTopicSimilarity();
         Map<Integer, Integer> topicReducedSequence = topicSimilarity.getTopicReduceSequence();
 
         SortTopics sortTopics = new SortTopics(topicReducedSequence);
         String[] sortedTopics = sortTopics.generateSortedTopics(topicsFilePath);
 
-        DocTopicMatrixReader docTopicMatrixReader = new DocTopicMatrixReader(compositionFilePath, topicCount);
-        RealMatrix doctopicMatrix = docTopicMatrixReader.read();
-//        for(int i = 0; i < doctopicMatrix.getRowDimension(); i++) {
-//            for(int j = 0; j < doctopicMatrix.getColumnDimension(); j++) {
-//                System.out.print(doctopicMatrix.getEntry(i, j) + " ");
-//            }
-//            System.out.println();
-//        }
+        MatrixReader docTopicMatrixReader = new DocumentTopicMatrixReader(compositionFilePath, topicCount);
 
-
-//        output += "Topic similarity sequence\n";
-//        output += generateTopicSimilarity(topicSimilarity);
-//        output += "Re-ranking in terms of topic similarity\n";
-//        output += generateSortTopics(sortedTopics);
+//        output += printTopicWordMatrix(topicWordMatrixReader);
+        output += "Topic similarity sequence\n";
+        output += generateTopicSimilarity(topicSimilarity);
+        output += "Re-ranking in terms of topic similarity\n";
+        output += generateSortTopics(sortedTopics);
 
         writeToFile(outputFile, output);
+    }
+
+    public static String printTopicWordMatrix(MatrixReader topicWordMatrixReader) {
+        String output = "";
+        RealMatrix topicWordMatrix = topicWordMatrixReader.read();
+        for(int i = 0; i < topicWordMatrix.getRowDimension(); i++) {
+            for(int j = 0; j < topicWordMatrix.getColumnDimension(); j++) {
+                output = output + topicWordMatrix.getEntry(i, j) + "\t";
+            }
+            output += "\n";
+        }
+        return output;
+    }
+
+    public static String printDocumentTopicMatrix(MatrixReader docTopicMatrixReader) {
+        String output = "";
+        RealMatrix doctopicMatrix = docTopicMatrixReader.read();
+        for(int i = 0; i < doctopicMatrix.getRowDimension(); i++) {
+            for(int j = 0; j < doctopicMatrix.getColumnDimension(); j++) {
+                output = output + doctopicMatrix.getEntry(i, j) + "\t";
+            }
+            output += "\n";
+        }
+        return output;
     }
 
     public static String generateTopicSimilarity(TopicSimilarity topicSimilarity) {

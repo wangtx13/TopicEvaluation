@@ -10,11 +10,11 @@ import java.util.Iterator;
 /**
  * Created by wangtianxia1 on 16/7/18.
  */
-public class DocTopicMatrixReader implements MatrixReader{
+public class DocumentTopicMatrixReader implements MatrixReader{
     private RealMatrix docTopicMatrixReader;
     private ArrayList<String> fileList = new ArrayList<>();
 
-    public DocTopicMatrixReader(String compositionFilePath, int topicCount) {
+    public DocumentTopicMatrixReader(String compositionFilePath, int topicCount) {
         this.docTopicMatrixReader = getDocTopicMatrixReader(compositionFilePath, topicCount);
     }
 

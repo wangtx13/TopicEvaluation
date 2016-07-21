@@ -26,10 +26,10 @@ public class TopicWordMatrixReader implements MatrixReader {
         int totalTermCount = 0;//The number of terms
         String line = null;
         int[] totalWordCount = new int[topicCount];//The number of words, onw term may appears several times
-//        //initialization
-//        for(int eachCount :totalWordCount) {
-//            eachCount = 0;
-//        }
+        //initialization
+        for(int eachCount :totalWordCount) {
+            eachCount = 0;
+        }
 
         try {
             try (
@@ -72,9 +72,6 @@ public class TopicWordMatrixReader implements MatrixReader {
                     }
                 }
 
-                for(int eachCount :totalWordCount) {
-                   System.out.println(eachCount);
-                }
                 topicWordMatrix = MatrixUtils.createRealMatrix(topicWordMatrixData);
             }
         } catch (FileNotFoundException e) {
