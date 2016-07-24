@@ -11,4 +11,6 @@ public interface MatrixReader {
     RealMatrix read();
 
     Map<String,Integer> getColumnHeaderList();
+
+    Map<Integer, String> getRowHeaderList();
 }

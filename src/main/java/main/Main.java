@@ -1,5 +1,6 @@
 package main;
 
+import coverageandvariance.CoverageAndVariance;
 import matrixreader.DocumentTopicMatrixReader;
 import matrixreader.MatrixReader;
 import matrixreader.TopicWordMatrixReader;
@@ -7,10 +8,8 @@ import org.apache.commons.math3.linear.RealMatrix;
 import topics.similarity.SortTopics;
 import topics.similarity.TopicSimilarity;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -26,6 +25,7 @@ public class Main {
         String wordCountFilePath = rootPath + "/word_top.txt";
         String topicsFilePath = rootPath + "/keys.txt";
         String compositionFilePath = rootPath + "/composition.txt";
+        String documentsWordsCountPath = rootPath + "/documentsWordsCount.txt";
         Scanner in = new Scanner(System.in);
         System.out.println("Please input the number of topics:");
         int topicCount = in.nextInt();
@@ -46,11 +46,36 @@ public class Main {
         String[] sortedTopics = sortTopics.generateSortedTopics(topicsFilePath);
 
         MatrixReader docTopicMatrixReader = new DocumentTopicMatrixReader(compositionFilePath, topicCount);
+        //generate words count list for all documents
+        Map<String, Integer> documentsWordsCountList = new HashMap<>();
+        try{
+            try(
+                    InputStream inputStream = new FileInputStream(new File(documentsWordsCountPath));
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+
+                String line = "";
+                while((line=reader.readLine())!=null) {
+                    String[] labels = line.split("\t");//labels[0] is the documents' name, label[1] is word count in the document
+                    documentsWordsCountList.put(labels[0], Integer.parseInt(labels[1]));
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //calculate weighted topic coverage and variation, and its relevant topic rank value
+        for(int i  = 0;i < topicCount; i++) {
+            CoverageAndVariance coverageAndVariance = new CoverageAndVariance(docTopicMatrixReader, documentsWordsCountList, i);
+            double topicRankValue = coverageAndVariance.calculateTopicRankValue(1, 0);
+        }
+
 
 //        output += printTopicWordMatrix(topicWordMatrixReader);
 //        output += "Topic similarity sequence\n";
 //        output += generateTopicSimilarity(topicSimilarity);
-        output += "Re-ranking in terms of topic similarity and KR2\n";
+        output += "Re-ranking in terms of topic similarity and KR1\n";
         output += generateSortTopics(sortedTopics);
 
         writeToFile(outputFile, output);
@@ -110,10 +135,10 @@ public class Main {
 
     public static String printDocumentTopicMatrix(MatrixReader documentTopicMatrixReader) {
         String output = "";
-        RealMatrix doctopicMatrix = documentTopicMatrixReader.read();
-        for(int i = 0; i < doctopicMatrix.getRowDimension(); i++) {
-            for(int j = 0; j < doctopicMatrix.getColumnDimension(); j++) {
-                output = output + doctopicMatrix.getEntry(i, j) + "\t";
+        RealMatrix documentTopicMatrix = documentTopicMatrixReader.read();
+        for(int i = 0; i < documentTopicMatrix.getRowDimension(); i++) {
+            for(int j = 0; j < documentTopicMatrix.getColumnDimension(); j++) {
+                output = output + documentTopicMatrix.getEntry(i, j) + "\t";
             }
             output += "\n";
         }

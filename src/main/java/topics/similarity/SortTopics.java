@@ -1,6 +1,6 @@
 package topics.similarity;
 
-import keywords.reranking.ReRankingByKR2;
+import keywords.reranking.ReRankingKeywords;
 import matrixreader.MatrixReader;
 import org.apache.commons.math3.linear.RealMatrix;
 
@@ -35,8 +35,9 @@ public class SortTopics {
                     String[] labels = line.split("\t| ");
                     int topicIndex = Integer.parseInt(labels[0]);//label[0] is topic index
                     //re-ranking the keywords in terms of KR2; the number of rows of topic word Matrix is the topic count
-                    ReRankingByKR2 reRankingByKR2 = new ReRankingByKR2(topicWordMatrix, topicWordMatrix.getRowDimension(), columnHeaderList);
-                    line = reRankingByKR2.reRankingKeywords(line, topicIndex);
+                    ReRankingKeywords reRankingKeywords = new ReRankingKeywords(topicWordMatrix, topicWordMatrix.getRowDimension(), columnHeaderList);
+//                    line = reRankingKeywords.reRankingKeywordsByKR2(line, topicIndex);
+                    line = reRankingKeywords.reRankingKeywordsByKR1(line, topicIndex);
                     int newIndex = topicCount - topicReduceSequence.get(topicIndex) - 1;
                     sortedTopics[newIndex] = line;
                 }

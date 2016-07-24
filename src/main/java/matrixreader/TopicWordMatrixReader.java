@@ -96,4 +96,9 @@ public class TopicWordMatrixReader implements MatrixReader {
     public RealMatrix read() {
         return topicWordMatrix;
     }
+
+    @Override
+    public Map<Integer, String> getRowHeaderList() {
+        return null;
+    }
 }

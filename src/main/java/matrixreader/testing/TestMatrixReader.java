@@ -39,4 +39,9 @@ public class TestMatrixReader implements MatrixReader {
     public Map<String, Integer> getColumnHeaderList() {
         return null;
     }
+
+    @Override
+    public Map<Integer, String> getRowHeaderList() {
+        return null;
+    }
 }
