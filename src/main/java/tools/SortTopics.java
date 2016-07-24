@@ -1,4 +1,4 @@
-package topics.similarity;
+package tools;
 
 import keywords.reranking.ReRankingKeywords;
 import matrixreader.MatrixReader;
@@ -13,17 +13,18 @@ import java.util.Map;
 //The last removed topics should be ranked highest
 public class SortTopics {
     private RealMatrix topicWordMatrix;
-    private Map<Integer, Integer> topicReduceSequence;
+    private Map<Integer, Integer> topicSequence;//<Topic, Sequence>
     private Map<String, Integer> columnHeaderList;
 
-    public SortTopics(MatrixReader topicWordMatrixReader, Map<Integer, Integer> topicReduceSequence) {
+    public SortTopics(MatrixReader topicWordMatrixReader, Map<Integer, Integer> topicSequence) {
         topicWordMatrix = topicWordMatrixReader.read();
-        this.topicReduceSequence = topicReduceSequence;
+        this.topicSequence = topicSequence;
         columnHeaderList = topicWordMatrixReader.getColumnHeaderList();
     }
 
-    public String[] generateSortedTopics(String topicsFilePath) {
-        int topicCount = topicReduceSequence.keySet().size();
+    //generate topics in ascending or descending order
+    public String[] generateSortedTopics(String topicsFilePath, boolean isAscending) {
+        int topicCount = topicSequence.keySet().size();
         String[] sortedTopics = new String[topicCount];
 
         String line = null;
@@ -34,11 +35,19 @@ public class SortTopics {
                 while ((line = reader.readLine()) != null) {
                     String[] labels = line.split("\t| ");
                     int topicIndex = Integer.parseInt(labels[0]);//label[0] is topic index
-                    //re-ranking the keywords in terms of KR2; the number of rows of topic word Matrix is the topic count
+                    //re-ranking the keywords in terms of KR2/KR2; the number of rows of topic word Matrix is the topic count
                     ReRankingKeywords reRankingKeywords = new ReRankingKeywords(topicWordMatrix, topicWordMatrix.getRowDimension(), columnHeaderList);
 //                    line = reRankingKeywords.reRankingKeywordsByKR2(line, topicIndex);
                     line = reRankingKeywords.reRankingKeywordsByKR1(line, topicIndex);
-                    int newIndex = topicCount - topicReduceSequence.get(topicIndex) - 1;
+                    int newIndex;
+                    if(isAscending) {
+                        //in ascending order
+                        newIndex = topicCount - topicSequence.get(topicIndex) - 1;
+                    }
+                    else {
+                        //in descending order
+                        newIndex = topicSequence.get(topicIndex);
+                    }
                     sortedTopics[newIndex] = line;
                 }
             }

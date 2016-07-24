@@ -11,14 +11,14 @@ import org.apache.commons.math3.util.FastMath;
 
 import java.util.*;
 
-import static tools.Tools.sortMap;
+import static tools.Tools.sortMapStringKey;
 
 public class TopicSimilarity {
 
     private Map<String, Double> similarities;
     private RealMatrix topicWordMatrix;
     private Map<Integer, Double> similaritiesAtReducedSeq;
-    private Map<Integer, Integer> topicReduceSequence;
+    private Map<Integer, Integer> topicReduceSequence;//<Topic, Sequence>
 
     public TopicSimilarity(MatrixReader matrixReader) {
         similarities = new HashMap<String, Double>();
@@ -30,7 +30,7 @@ public class TopicSimilarity {
     public void generateTopicSimilarity() {
         int topicsCount = topicWordMatrix.getRowDimension();
         similarities = calculateSimilarities(topicWordMatrix, topicsCount);
-        similarities = sortMap(similarities);
+        similarities = sortMapStringKey(similarities);
         generateTopicSequence(similarities);
     }
 

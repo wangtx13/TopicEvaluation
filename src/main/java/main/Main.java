@@ -1,11 +1,12 @@
 package main;
 
 import coverageandvariance.CoverageAndVariance;
+import coverageandvariance.TopicReRankByCovAndVar;
 import matrixreader.DocumentTopicMatrixReader;
 import matrixreader.MatrixReader;
 import matrixreader.TopicWordMatrixReader;
 import org.apache.commons.math3.linear.RealMatrix;
-import topics.similarity.SortTopics;
+import tools.SortTopics;
 import topics.similarity.TopicSimilarity;
 
 import java.io.*;
@@ -41,42 +42,25 @@ public class Main {
         TopicSimilarity topicSimilarity = new TopicSimilarity(topicWordMatrixReader);
         topicSimilarity.generateTopicSimilarity();
         Map<Integer, Integer> topicReducedSequence = topicSimilarity.getTopicReduceSequence();
-
-        SortTopics sortTopics = new SortTopics(topicWordMatrixReader, topicReducedSequence);
-        String[] sortedTopics = sortTopics.generateSortedTopics(topicsFilePath);
+        SortTopics sortTopicsBySimilarity = new SortTopics(topicWordMatrixReader, topicReducedSequence);
+        String[] sortedTopicsBySimilarity = sortTopicsBySimilarity.generateSortedTopics(topicsFilePath, true);//in ascending order
 
         MatrixReader docTopicMatrixReader = new DocumentTopicMatrixReader(compositionFilePath, topicCount);
-        //generate words count list for all documents
-        Map<String, Integer> documentsWordsCountList = new HashMap<>();
-        try{
-            try(
-                    InputStream inputStream = new FileInputStream(new File(documentsWordsCountPath));
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
 
-                String line = "";
-                while((line=reader.readLine())!=null) {
-                    String[] labels = line.split("\t");//labels[0] is the documents' name, label[1] is word count in the document
-                    documentsWordsCountList.put(labels[0], Integer.parseInt(labels[1]));
-                }
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        TopicReRankByCovAndVar topicReRankByCovAndVar = new TopicReRankByCovAndVar(docTopicMatrixReader, documentsWordsCountPath, topicCount);
+        Map<Integer, Integer> topicRankSequence = topicReRankByCovAndVar.getTopicRankSequence();
+        printReRankValue(topicReRankByCovAndVar.getTopicRankValues());//test
+        printTopicSequence(topicRankSequence);//test
+        SortTopics sortTopicsByCovAndVar = new SortTopics(topicWordMatrixReader, topicRankSequence);
+        String[] sortedTopicsByCovAndVar = sortTopicsByCovAndVar.generateSortedTopics(topicsFilePath, false);//in descending order
 
-        //calculate weighted topic coverage and variation, and its relevant topic rank value
-        for(int i  = 0;i < topicCount; i++) {
-            CoverageAndVariance coverageAndVariance = new CoverageAndVariance(docTopicMatrixReader, documentsWordsCountList, i);
-            double topicRankValue = coverageAndVariance.calculateTopicRankValue(1, 0);
-        }
-
-
-//        output += printTopicWordMatrix(topicWordMatrixReader);
 //        output += "Topic similarity sequence\n";
 //        output += generateTopicSimilarity(topicSimilarity);
-        output += "Re-ranking in terms of topic similarity and KR1\n";
-        output += generateSortTopics(sortedTopics);
+        output += "Re-ranking in terms of topic similarity by KR1\n";
+        output += generateSortTopics(sortedTopicsBySimilarity);
+        output += "\n";
+        output += "Re-ranking in terms of weighted topic coverage and variation by KR1\n";
+        output += generateSortTopics(sortedTopicsByCovAndVar);
 
         writeToFile(outputFile, output);
     }
@@ -93,7 +77,6 @@ public class Main {
             output = output + "[row, col] : " + entry.getKey()
                     + " [Topic Similarity] : " + entry.getValue() + "\n";
         }
-//        printSortedSimilarities(similarities);
 
         output = output + "Topics' similarities:\n";
         Map<Integer, Double> similaritiesAtReducedSeq = topicSimilarity.getSimilaritiesAtReducedSeq();
@@ -101,15 +84,13 @@ public class Main {
             output = output + "[Topic] : " + entry.getKey()
                     + " [Topic Similarity] : " + entry.getValue() + "\n";
         }
-//        printSimilaritiesAtReducedSeq(similaritiesAtReducedSeq);
 
         output = output + "Topic Reduced Sequence\n";
         Map<Integer, Integer> topicReduceSequence = topicSimilarity.getTopicReduceSequence();
         for (Map.Entry<Integer, Integer> entry : topicReduceSequence.entrySet()) {
            output = output + "[Topic] : " + entry.getKey()
-                    + " [Index] : " + entry.getValue() + "\n";
+                    + " [Sequence] : " + entry.getValue() + "\n";
         }
-//        printTopicReduceSequence(topicReduceSequence);
         return output;
     }
 
@@ -152,17 +133,17 @@ public class Main {
         }
     }
 
-    public static void printSimilaritiesAtReducedSeq(Map<Integer, Double> map) {
+    public static void printReRankValue(Map<Integer, Double> map) {
         for (Map.Entry<Integer, Double> entry : map.entrySet()) {
             System.out.println("[Topic] : " + entry.getKey()
-                    + " [Topic Similarity] : " + entry.getValue());
+                    + " [Value] : " + entry.getValue());
         }
     }
 
-    public static void printTopicReduceSequence(Map<Integer, Integer> map) {
+    public static void printTopicSequence(Map<Integer, Integer> map) {
         for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
             System.out.println("[Topic] : " + entry.getKey()
-                    + " [Index] : " + entry.getValue());
+                    + " [Sequence] : " + entry.getValue());
         }
     }
 
