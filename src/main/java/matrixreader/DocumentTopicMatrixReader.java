@@ -15,6 +15,7 @@ import java.util.Map;
 public class DocumentTopicMatrixReader implements MatrixReader{
     private RealMatrix docTopicMatrixReader;
     private Map<Integer, String> fileList = new HashMap<>();//<row index in document-topic matrix, file name>
+    private Map<Integer, String[]> topDocumentList = new HashMap<>();//<topic, top docuemnt list
 
     public DocumentTopicMatrixReader(String compositionFilePath, int topicCount) {
         this.docTopicMatrixReader = getDocTopicMatrixReader(compositionFilePath, topicCount);
@@ -41,18 +42,53 @@ public class DocumentTopicMatrixReader implements MatrixReader{
         }
 
         docTopicMatrix = MatrixUtils.createRealMatrix(docCount, topicCount);
-        Iterator it = composition.iterator();
-        int row = 0;
-        while(it.hasNext()){
-            String[] cols = it.next().toString().split("\t| ");//cols[0] is the row index in document-topic matrix, col[1] is the file name
-            fileList.put(Integer.parseInt(cols[0]), cols[1]);
-            for(int i = 0; i < topicCount; i++) {
-                docTopicMatrix.setEntry(row, i, Double.parseDouble(cols[i+2]));
+        for(int i = 0; i < topicCount; i ++) {
+            Iterator it = composition.iterator();
+            int row = 0;
+            double maxValue = 0;
+            double secondMaxValue = 0;
+            double thirdMaxValue = 0;
+            String maxDocument = "";
+            String secondMaxDocument = "";
+            String thirdMaxDocument = "";
+            while(it.hasNext()) {
+                String[] cols = it.next().toString().split("\t| ");//cols[0] is the row index in document-topic matrix, col[1] is the file name
+                String fileName = cols[1];
+                fileList.put(Integer.parseInt(cols[0]), fileName);
+                double value = Double.parseDouble(cols[i+2]);
+                if (value > maxValue) {
+                    maxDocument = fileName;
+                    maxValue = value;
+                } else if (value > secondMaxValue) {
+                    secondMaxDocument = fileName;
+                    secondMaxValue = value;
+                } else if (value > thirdMaxValue) {
+                    thirdMaxDocument = fileName;
+                    thirdMaxValue = value;
+                }
+                docTopicMatrix.setEntry(row, i, value);
+                row++;
             }
-            row++;
+            String[] topDocuments = {maxDocument, secondMaxDocument, thirdMaxDocument};
+            topDocumentList.put(i, topDocuments);
+        }
+
+        //test for topDocumentList
+        for(Map.Entry<Integer, String[]> entry:topDocumentList.entrySet()) {
+            int index = entry.getKey();
+            System.out.print(index + ":");
+            String[] strs = entry.getValue();
+            for(int i = 0; i < 3; i++) {
+                System.out.println(strs[i]);
+            }
+            System.out.println();
         }
 
         return docTopicMatrix;
+    }
+
+    public Map<Integer, String[]> getTopDocumentList() {
+        return topDocumentList;
     }
 
     @Override

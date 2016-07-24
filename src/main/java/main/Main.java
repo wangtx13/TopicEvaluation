@@ -23,7 +23,7 @@ public class Main {
         Scanner str = new Scanner(System.in);
         System.out.println("Please input the root path of files:");
         String rootPath = str.next();
-        String wordCountFilePath = rootPath + "/word_top.txt";
+        String wordCountFilePath = rootPath + "/word-top.txt";
         String topicsFilePath = rootPath + "/keys.txt";
         String compositionFilePath = rootPath + "/composition.txt";
         String documentsWordsCountPath = rootPath + "/documentsWordsCount.txt";
@@ -49,8 +49,8 @@ public class Main {
 
         TopicReRankByCovAndVar topicReRankByCovAndVar = new TopicReRankByCovAndVar(docTopicMatrixReader, documentsWordsCountPath, topicCount);
         Map<Integer, Integer> topicRankSequence = topicReRankByCovAndVar.getTopicRankSequence();
-        printReRankValue(topicReRankByCovAndVar.getTopicRankValues());//test
-        printTopicSequence(topicRankSequence);//test
+//        printReRankValue(topicReRankByCovAndVar.getTopicRankValues());//test
+//        printTopicSequence(topicRankSequence);//test
         SortTopics sortTopicsByCovAndVar = new SortTopics(topicWordMatrixReader, topicRankSequence);
         String[] sortedTopicsByCovAndVar = sortTopicsByCovAndVar.generateSortedTopics(topicsFilePath, false);//in descending order
 
