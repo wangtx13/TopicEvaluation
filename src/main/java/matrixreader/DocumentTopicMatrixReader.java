@@ -74,15 +74,15 @@ public class DocumentTopicMatrixReader implements MatrixReader{
         }
 
         //test for topDocumentList
-        for(Map.Entry<Integer, String[]> entry:topDocumentList.entrySet()) {
-            int index = entry.getKey();
-            System.out.print(index + ":");
-            String[] strs = entry.getValue();
-            for(int i = 0; i < 3; i++) {
-                System.out.println(strs[i]);
-            }
-            System.out.println();
-        }
+//        for(Map.Entry<Integer, String[]> entry:topDocumentList.entrySet()) {
+//            int index = entry.getKey();
+//            System.out.print(index + ":");
+//            String[] strs = entry.getValue();
+//            for(int i = 0; i < 3; i++) {
+//                System.out.println(strs[i]);
+//            }
+//            System.out.println();
+//        }
 
         return docTopicMatrix;
     }

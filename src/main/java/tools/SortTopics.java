@@ -37,8 +37,9 @@ public class SortTopics {
                     int topicIndex = Integer.parseInt(labels[0]);//label[0] is topic index
                     //re-ranking the keywords in terms of KR2/KR2; the number of rows of topic word Matrix is the topic count
                     ReRankingKeywords reRankingKeywords = new ReRankingKeywords(topicWordMatrix, topicWordMatrix.getRowDimension(), columnHeaderList);
-//                    line = reRankingKeywords.reRankingKeywordsByKR2(line, topicIndex);
-                    line = reRankingKeywords.reRankingKeywordsByKR1(line, topicIndex);
+                    line = reRankingKeywords.reRankingKeywordsByKR2(line, topicIndex);
+//                    line = reRankingKeywords.reRankingKeywordsByKR1(line, topicIndex);
+//                    line = reRankingKeywords.reRankingKeywordsByKR0(line, topicIndex);
                     int newIndex;
                     if(isAscending) {
                         //in ascending order

@@ -27,15 +27,29 @@ public class Main {
         String topicsFilePath = rootPath + "/keys.txt";
         String compositionFilePath = rootPath + "/composition.txt";
         String documentsWordsCountPath = rootPath + "/documentsWordsCount.txt";
-        Scanner in = new Scanner(System.in);
-        System.out.println("Please input the number of topics:");
-        int topicCount = in.nextInt();
         Scanner strOut = new Scanner(System.in);
         System.out.println("Please input the output file name:");
         String outputFileName = "./" + strOut.next() + ".txt";
 
         File outputFile = new File(outputFileName);
         String output = "";
+
+        int topicCount = 0;
+        try{
+            try(
+                    InputStream inputStream = new FileInputStream(topicsFilePath);
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))){
+
+                String topicFileLine = "";
+                while((topicFileLine = reader.readLine())!=null) {
+                    topicCount++;
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         MatrixReader topicWordMatrixReader = new TopicWordMatrixReader(wordCountFilePath, topicCount);
 
